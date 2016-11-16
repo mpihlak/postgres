@@ -241,6 +241,14 @@ static volatile bool got_SIGHUP = false;
  */
 static instr_time total_func_time;
 
+/*
+ * Hooks to be called from the backends when reporting stats to the collector
+ * or initializing/finalzing the per-object stats counters.
+ */
+report_stat_hook_type report_stat_hook = NULL;
+start_function_stat_hook_type start_function_stat_hook = NULL;
+end_function_stat_hook_type end_function_stat_hook = NULL;
+start_table_stat_hook_type start_table_stat_hook = NULL;
 
 /* ----------
  * Local function forward declarations
@@ -834,6 +842,10 @@ pgstat_report_stat(bool force)
 
 	/* Now, send function statistics */
 	pgstat_send_funcstats();
+
+	/* Call any hooks after the stats have been sent */
+	if (report_stat_hook)
+		report_stat_hook();
 }
 
 /*
@@ -1545,6 +1557,10 @@ pgstat_init_function_usage(FunctionCallInfoData *fcinfo,
 
 	/* get clock time as of function start */
 	INSTR_TIME_SET_CURRENT(fcu->f_start);
+
+	/* Call hooks */
+	if (start_function_stat_hook)
+		start_function_stat_hook(fcinfo, fcu);
 }
 
 /*
@@ -1615,6 +1631,10 @@ pgstat_end_function_usage(PgStat_FunctionCallUsage *fcu, bool finalize)
 
 	/* indicate that we have something to send */
 	have_function_stats = true;
+
+	/* Call any hooks */
+	if (end_function_stat_hook)
+		end_function_stat_hook(fcu, finalize);
 }
 
 
@@ -1664,6 +1684,10 @@ pgstat_initstats(Relation rel)
 
 	/* Else find or make the PgStat_TableStatus entry, and update link */
 	rel->pgstat_info = get_tabstat_entry(rel_id, rel->rd_rel->relisshared);
+
+	/* Call any hooks */
+	if (start_table_stat_hook)
+		start_table_stat_hook(rel);
 }
 
 /*

@@ -987,6 +987,18 @@ typedef struct PgStat_FunctionCallUsage
 	instr_time	f_start;
 } PgStat_FunctionCallUsage;
 
+/*
+ * Hooks for extending the stats reporting subsystem
+ */
+typedef void (*report_stat_hook_type)(void);
+typedef void (*start_function_stat_hook_type)(FunctionCallInfoData *, PgStat_FunctionCallUsage *);
+typedef void (*end_function_stat_hook_type)(PgStat_FunctionCallUsage *, bool finalize);
+typedef void (*start_table_stat_hook_type)(Relation);
+
+extern PGDLLIMPORT report_stat_hook_type report_stat_hook;
+extern PGDLLIMPORT start_function_stat_hook_type start_function_stat_hook;
+extern PGDLLIMPORT end_function_stat_hook_type end_function_stat_hook;
+extern PGDLLIMPORT start_table_stat_hook_type start_table_stat_hook;
 
 /* ----------
  * GUC parameters
