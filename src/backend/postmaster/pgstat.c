@@ -780,6 +780,10 @@ pgstat_report_stat(bool force)
 		return;
 	last_report = now;
 
+	/* Call any hooks before the stats have been cleared */
+	if (report_stat_hook)
+		report_stat_hook();
+
 	/*
 	 * Scan through the TabStatusArray struct(s) to find tables that actually
 	 * have counts, and build messages to send.  We have to separate shared
@@ -842,10 +846,6 @@ pgstat_report_stat(bool force)
 
 	/* Now, send function statistics */
 	pgstat_send_funcstats();
-
-	/* Call any hooks after the stats have been sent */
-	if (report_stat_hook)
-		report_stat_hook();
 }
 
 /*
