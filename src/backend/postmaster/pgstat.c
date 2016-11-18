@@ -1676,15 +1676,11 @@ pgstat_initstats(Relation rel)
 	}
 
 	/*
-	 * If we already set up this relation in the current transaction, nothing
-	 * to do.
+	 * Find or make the PgStat_TableStatus entry and update link, if we have
+	 * not done that alreay
 	 */
-	if (rel->pgstat_info != NULL &&
-		rel->pgstat_info->t_id == rel_id)
-		return;
-
-	/* Else find or make the PgStat_TableStatus entry, and update link */
-	rel->pgstat_info = get_tabstat_entry(rel_id, rel->rd_rel->relisshared);
+	if (!rel->pgstat_info || rel->pgstat_info->t_id != rel_id)
+		rel->pgstat_info = get_tabstat_entry(rel_id, rel->rd_rel->relisshared);
 
 	/* Call any hooks */
 	if (start_table_stat_hook)
