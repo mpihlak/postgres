@@ -179,6 +179,8 @@ index_close(Relation relation, LOCKMODE lockmode)
 
 	if (lockmode != NoLock)
 		UnlockRelationId(&relid, lockmode);
+
+	pgstat_endstats(relation);
 }
 
 /* ----------------
