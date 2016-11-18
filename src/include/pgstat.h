@@ -994,11 +994,13 @@ typedef void (*report_stat_hook_type)(void);
 typedef void (*start_function_stat_hook_type)(FunctionCallInfoData *, PgStat_FunctionCallUsage *);
 typedef void (*end_function_stat_hook_type)(PgStat_FunctionCallUsage *, bool finalize);
 typedef void (*start_table_stat_hook_type)(Relation);
+typedef void (*end_table_stat_hook_type)(Relation);
 
 extern PGDLLIMPORT report_stat_hook_type report_stat_hook;
 extern PGDLLIMPORT start_function_stat_hook_type start_function_stat_hook;
 extern PGDLLIMPORT end_function_stat_hook_type end_function_stat_hook;
 extern PGDLLIMPORT start_table_stat_hook_type start_table_stat_hook;
+extern PGDLLIMPORT end_table_stat_hook_type end_table_stat_hook;
 
 /* ----------
  * GUC parameters
@@ -1089,6 +1091,7 @@ extern PgStat_TableStatus *find_tabstat_entry(Oid rel_id);
 extern PgStat_BackendFunctionEntry *find_funcstat_entry(Oid func_id);
 
 extern void pgstat_initstats(Relation rel);
+extern void pgstat_endstats(Relation rel);
 
 /* ----------
  * pgstat_report_wait_start() -

@@ -249,6 +249,7 @@ report_stat_hook_type report_stat_hook = NULL;
 start_function_stat_hook_type start_function_stat_hook = NULL;
 end_function_stat_hook_type end_function_stat_hook = NULL;
 start_table_stat_hook_type start_table_stat_hook = NULL;
+end_table_stat_hook_type end_table_stat_hook = NULL;
 
 /* ----------
  * Local function forward declarations
@@ -1689,6 +1690,25 @@ pgstat_initstats(Relation rel)
 	if (start_table_stat_hook)
 		start_table_stat_hook(rel);
 }
+
+
+/* ----------
+ * pgstat_endstats() -
+ *
+ *	Finalize statistics collection for a relation.
+ *	Called whenever a relation is closed.
+ *
+ *  Presently this is just an placeholder for enabling hooking into. The stats
+ *  collector itself really doesn't do anything here.
+ * ----------
+ */
+void
+pgstat_endstats(Relation rel)
+{
+	if (end_table_stat_hook)
+		end_table_stat_hook(rel);
+}
+
 
 /*
  * get_tabstat_entry - find or create a PgStat_TableStatus entry for rel
